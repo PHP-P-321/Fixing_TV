@@ -54,13 +54,21 @@ $select_all_finish_requests = mysqli_fetch_all($select_all_finish_requests);
                     <li><strong>Тип подсветки экрана: </strong> <?= $request[4] ?> </li>
                     <li><strong>Диагональ экрана (дюйм): </strong> <?= $request[5] ?> </li>
                     <li><strong>Частота обновления экрана: </strong> <?= $request[6] ?>Гц </li>
-                    <li>
-                        <?php 
-                            if($request[7] == 1) { ?>
-                                <a href="./vendor/appoint-request.php?id_request=<?= $request[0] ?>">Откликнуться</a>
-                            <?php }
-                        ?>
-                    </li>
+                    <?php 
+                        $id_master = $_COOKIE['id_user'];
+                        $master_ids = explode(',', $request[1]);
+                        if (!in_array($id_master, $master_ids)) { ?>
+                            <li>
+                                <?php 
+                                    if($request[7] == 1) { ?>
+                                        <a href="./vendor/appoint-request.php?id_request=<?= $request[0] ?>">Откликнуться</a>
+                                    <?php }
+                                ?>
+                            </li>
+                        <?php } else {
+                            echo "<br> Вы уже откликнулись!";
+                        }
+                    ?>
                 </ul>
                 <hr>
             <?php } ?>
@@ -95,6 +103,23 @@ $select_all_finish_requests = mysqli_fetch_all($select_all_finish_requests);
                             <?php }
                         ?>
                         </li>
+                        <?php 
+                            if (!empty($request[1])) {
+                                $master_ids = explode(',', $request[1]);
+                                $ids_str = implode(',', $master_ids);
+                                $select_fullname_master = mysqli_query($connect, "SELECT `id`, `fullname` FROM `users` WHERE `id` IN ($ids_str)"); ?>
+                                <li>
+                                    <strong>Откликнувшиеся мастера:</strong>
+                                    <ul>
+                                        <?php while ($row = mysqli_fetch_assoc($select_fullname_master)) { ?>
+                                            <li>
+                                                <a href="./master.php/id_master=<?= $row['id'] ?>"><?= $row['fullname'] ?></a>
+                                            </li>
+                                        <?php } ?>
+                                    </ul>
+                                </li>
+                            <?php }
+                        ?>
                     </ul>
                     <hr>
                 <?php } ?>

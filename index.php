@@ -11,7 +11,7 @@ require_once("./db/db.php"); // Подключаем файл с настрой�
 
 if($_COOKIE['role'] == 1) {
     $id_master = $_COOKIE['id_user'];
-    $select_tv_in_repair = mysqli_query($connect, "SELECT * FROM `requests` WHERE `id_master` = '$id_master' AND `status` != 3");
+    $select_tv_in_repair = mysqli_query($connect, "SELECT * FROM `requests` WHERE FIND_IN_SET('$id_master', `id_master`) AND `status` != 3");
     $select_tv_in_repair = mysqli_fetch_all($select_tv_in_repair);
 }
 
