@@ -16,9 +16,9 @@ $screen_diagonal = $_POST['screen_diagonal']; // Получаем Диагона
 $screen_refresh_rate = $_POST['screen_refresh_rate']; // Получаем Частоту обновление экрана из формы
 
 mysqli_query($connect, "INSERT INTO `requests`
-                        (`company_name`, `model_name`, `type_of_backlight`, `screen_diagonal`, `screen_refresh_rate`)
+                        (`company_name`, `model_name`, `type_of_backlight`, `screen_diagonal`, `screen_refresh_rate`, `status`)
                         VALUES
-                        ('$company_name', '$model_name', '$type_of_backlight', '$screen_diagonal', '$screen_refresh_rate')
+                        ('$company_name', '$model_name', '$type_of_backlight', '$screen_diagonal', '$screen_refresh_rate', 1)
 ");
 
 header("Location: ../index.php");

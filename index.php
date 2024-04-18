@@ -7,6 +7,14 @@ if(empty($_COOKIE['id_user'])) {
     header("Location: ./login.php");
 }
 
+require_once("./db/db.php"); // Подключаем файл с настройками базы данных
+
+if($_COOKIE['role'] == 1) {
+    $id_master = $_COOKIE['id_user'];
+    $select_tv_in_repair = mysqli_query($connect, "SELECT * FROM `requests` WHERE `id_master` = '$id_master' AND `status` != 3");
+    $select_tv_in_repair = mysqli_fetch_all($select_tv_in_repair);
+}
+
 ?>
 
 <!DOCTYPE html>
@@ -29,9 +37,13 @@ if(empty($_COOKIE['id_user'])) {
     <a href="./logout.php">Выйти</a>
     <br><br>
 
-    <?php if($_COOKIE['role'] == 1) {
-
-    } elseif ($_COOKIE['role'] == 2) { ?>
+    <?php if($_COOKIE['role'] == 1) { ?>
+        <a href="./requests.php">Все заявки на ремонт</a>
+        <h2>Телевизоре в ремонте</h2>
+        <?php 
+            var_dump($select_tv_in_repair);
+        ?>
+    <?php } elseif ($_COOKIE['role'] == 2) { ?>
         <a href="./requests.php">Мои заявки</a>
         <br>
         <h2>Создать заявку на ремонт</h2>
