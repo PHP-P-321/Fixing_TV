@@ -12,7 +12,7 @@ require_once("./db/db.php"); // Подключаем файл с настрой�
 $repair_requests_created = mysqli_query($connect, "SELECT * FROM `requests` WHERE `status` = 1 ORDER BY `id` DESC");
 $repair_requests_created = mysqli_fetch_all($repair_requests_created);
 
-$select_all_finish_requests = mysqli_query($connect, "SELECT * FROM `requests` WHERE `status` = 3 ORDER BY `id` DESC");
+$select_all_finish_requests = mysqli_query($connect, "SELECT * FROM `requests` WHERE `status` = 4 ORDER BY `id` DESC");
 $select_all_finish_requests = mysqli_fetch_all($select_all_finish_requests);
 
 ?>
@@ -90,6 +90,8 @@ $select_all_finish_requests = mysqli_fetch_all($select_all_finish_requests);
                                 if($request[7] == 1) {
                                     echo "Ожидание выбора мастера";
                                 } elseif($request[7] == 2) {
+                                    echo "На утверждении мастера";
+                                } elseif($request[7] == 3) {
                                     echo "В работе";
                                 } else {
                                     echo "Ремонт окончен";
@@ -113,7 +115,7 @@ $select_all_finish_requests = mysqli_fetch_all($select_all_finish_requests);
                                     <ul>
                                         <?php while ($row = mysqli_fetch_assoc($select_fullname_master)) { ?>
                                             <li>
-                                                <a href="./master.php/id_master=<?= $row['id'] ?>"><?= $row['fullname'] ?></a>
+                                                <a href="./master.php?id_master=<?= $row['id'] ?>"><?= $row['fullname'] ?></a> | <a href="./vendor/appoint-master.php?id_master=<?= $row['id'] ?>&id_request=<?= $request[0] ?>">Утвердить</a>
                                             </li>
                                         <?php } ?>
                                     </ul>
@@ -126,9 +128,28 @@ $select_all_finish_requests = mysqli_fetch_all($select_all_finish_requests);
             </div>
             <div>
                 <h2>Отремонтированные телевизоры</h2>
-                <?php
-                    var_dump($select_all_finish_requests);
-                ?>
+                <?php foreach($select_all_finish_requests as $request) { ?>
+                    <ul>
+                        <li><strong>Название производителя: </strong> <?= $request[2] ?> </li>
+                        <li><strong>Название модели телевизора: </strong> <?= $request[3] ?> </li>
+                        <li><strong>Тип подсветки экрана: </strong> <?= $request[4] ?> </li>
+                        <li><strong>Диагональ экрана (дюйм): </strong> <?= $request[5] ?> </li>
+                        <li><strong>Частота обновления экрана: </strong> <?= $request[6] ?>Гц </li>
+                        <li><strong>Цена за ремонт: </strong> <?= $request[8] ?> Руб.</li>
+                        <li>
+                            <strong>Мастер выполнивший ремонт: </strong> 
+                            <?php 
+                                $id_master = $request[1];
+                                $select_master = mysqli_query($connect, "SELECT `fullname` FROM `users` WHERE `id`='$id_master'");
+                                $select_master = mysqli_fetch_assoc($select_master);
+                            ?>
+
+                            <a href="./master.php?id_master=<?= $request[1] ?>"><?= $select_master['fullname'] ?></a>
+
+                        </li>
+                    </ul>
+                    <hr>
+                <?php } ?>
             </div>
         </div>
     <?php } ?>

@@ -11,8 +11,11 @@ require_once("./db/db.php"); // Подключаем файл с настрой�
 
 if($_COOKIE['role'] == 1) {
     $id_master = $_COOKIE['id_user'];
-    $select_tv_in_repair = mysqli_query($connect, "SELECT * FROM `requests` WHERE FIND_IN_SET('$id_master', `id_master`) AND `status` != 3");
+    $select_tv_in_repair = mysqli_query($connect, "SELECT * FROM `requests` WHERE FIND_IN_SET('$id_master', `id_master`) AND `status` >= 3 AND `status` < 4");
     $select_tv_in_repair = mysqli_fetch_all($select_tv_in_repair);
+
+    $select_tv_before_repair = mysqli_query($connect, "SELECT * FROM `requests` WHERE FIND_IN_SET('$id_master', `id_master`) AND `status` = 2");
+    $select_tv_before_repair = mysqli_fetch_all($select_tv_before_repair);
 }
 
 ?>
@@ -31,6 +34,13 @@ if($_COOKIE['role'] == 1) {
             gap: 10px;
             width: 300px;
         }
+        .wrapper {
+            display: flex;
+            justify-content: space-between;
+        }
+        .wrapper > div:first-child {
+            width: 400px;
+        }
     </style>
 </head>
 <body>
@@ -39,10 +49,41 @@ if($_COOKIE['role'] == 1) {
 
     <?php if($_COOKIE['role'] == 1) { ?>
         <a href="./requests.php">Все заявки на ремонт</a>
-        <h2>Телевизоре в ремонте</h2>
-        <?php 
-            var_dump($select_tv_in_repair);
-        ?>
+        <div class="wrapper">
+            <div>
+                <h2>Телевизоре в ремонте</h2>
+                <?php 
+                    foreach($select_tv_in_repair as $tv) { ?>
+                        <ul>
+                            <li><strong>Название производителя: </strong> <?= $tv[2] ?> </li>
+                            <li><strong>Название модели телевизора: </strong> <?= $tv[3] ?> </li>
+                            <li><strong>Тип подсветки экрана: </strong> <?= $tv[4] ?> </li>
+                            <li><strong>Диагональ экрана (дюйм): </strong> <?= $tv[5] ?> </li>
+                            <li><strong>Частота обновления экрана: </strong> <?= $tv[6] ?>Гц </li>
+                        </ul>
+                        <form action="./vendor/finish-request.php" method="post">
+                            <input type="hidden" name="id_request" value="<?= $tv[0] ?>">
+                            <input type="text" name="price" placeholder="Цена за ремонт" required>
+                            <input type="submit" value="Закончить ремонт">
+                        </form>
+                    <?php } ?>
+            </div>
+            <div>
+                <h2>Телевизоры на утверждение ремонта</h2>
+                <?php 
+                    foreach($select_tv_before_repair as $tv) { ?>
+                        <ul>
+                            <li><strong>Название производителя: </strong> <?= $tv[2] ?> </li>
+                            <li><strong>Название модели телевизора: </strong> <?= $tv[3] ?> </li>
+                            <li><strong>Тип подсветки экрана: </strong> <?= $tv[4] ?> </li>
+                            <li><strong>Диагональ экрана (дюйм): </strong> <?= $tv[5] ?> </li>
+                            <li><strong>Частота обновления экрана: </strong> <?= $tv[6] ?>Гц </li>
+                            <li><a href="./vendor/appoint-work.php?id_request=<?= $tv[0] ?>">Утвердить ремонт</a></li>
+                            <li><a href="./vendor/cancel-work.php?id_request=<?= $tv[0] ?>">Отказаться от ремонта</a></li>
+                        </ul>
+                    <?php } ?>
+            </div>
+        </div>
     <?php } elseif ($_COOKIE['role'] == 2) { ?>
         <a href="./requests.php">Мои заявки</a>
         <br>
