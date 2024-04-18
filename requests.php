@@ -9,10 +9,15 @@ if(empty($_COOKIE['id_user'])) {
 
 require_once("./db/db.php"); // Подключаем файл с настройками базы данных
 
-$repair_requests_created = mysqli_query($connect, "SELECT * FROM `requests` WHERE `status` = 1 ORDER BY `id` DESC");
+$id_client = $_COOKIE['id_user'];
+
+$repair_requests_created = mysqli_query($connect, "SELECT * FROM `requests` WHERE `id_client` = '$id_client' AND `status` = 1 ORDER BY `id` DESC");
 $repair_requests_created = mysqli_fetch_all($repair_requests_created);
 
-$select_all_finish_requests = mysqli_query($connect, "SELECT * FROM `requests` WHERE `status` = 4 ORDER BY `id` DESC");
+$repair_requests_created_1 = mysqli_query($connect, "SELECT * FROM `requests` WHERE `status` = 1 ORDER BY `id` DESC");
+$repair_requests_created_1 = mysqli_fetch_all($repair_requests_created_1);
+
+$select_all_finish_requests = mysqli_query($connect, "SELECT * FROM `requests` WHERE `id_client` = '$id_client' AND `status` = 4 ORDER BY `id` DESC");
 $select_all_finish_requests = mysqli_fetch_all($select_all_finish_requests);
 
 ?>
@@ -46,21 +51,21 @@ $select_all_finish_requests = mysqli_fetch_all($select_all_finish_requests);
 
     <?php if($_COOKIE['role'] == 1) { ?>
         <h2>Все заявки</h2>
-        <?php foreach($repair_requests_created as $request) { 
-            if ($request[7] == 1) { ?>
+        <?php foreach($repair_requests_created_1 as $request) { 
+            if ($request[8] == 1) { ?>
                 <ul>
-                    <li><strong>Название производителя: </strong> <?= $request[2] ?> </li>
-                    <li><strong>Название модели телевизора: </strong> <?= $request[3] ?> </li>
-                    <li><strong>Тип подсветки экрана: </strong> <?= $request[4] ?> </li>
-                    <li><strong>Диагональ экрана (дюйм): </strong> <?= $request[5] ?> </li>
-                    <li><strong>Частота обновления экрана: </strong> <?= $request[6] ?>Гц </li>
+                    <li><strong>Название производителя: </strong> <?= $request[3] ?> </li>
+                    <li><strong>Название модели телевизора: </strong> <?= $request[4] ?> </li>
+                    <li><strong>Тип подсветки экрана: </strong> <?= $request[5] ?> </li>
+                    <li><strong>Диагональ экрана (дюйм): </strong> <?= $request[6] ?> </li>
+                    <li><strong>Частота обновления экрана: </strong> <?= $request[7] ?>Гц </li>
                     <?php 
                         $id_master = $_COOKIE['id_user'];
                         $master_ids = explode(',', $request[1]);
                         if (!in_array($id_master, $master_ids)) { ?>
                             <li>
                                 <?php 
-                                    if($request[7] == 1) { ?>
+                                    if($request[8] == 1) { ?>
                                         <a href="./vendor/appoint-request.php?id_request=<?= $request[0] ?>">Откликнуться</a>
                                     <?php }
                                 ?>
@@ -79,19 +84,19 @@ $select_all_finish_requests = mysqli_fetch_all($select_all_finish_requests);
                 <h2>Созданные заявки на ремонт</h2>
                 <?php foreach($repair_requests_created as $request) { ?>
                     <ul>
-                        <li><strong>Название производителя: </strong> <?= $request[2] ?> </li>
-                        <li><strong>Название модели телевизора: </strong> <?= $request[3] ?> </li>
-                        <li><strong>Тип подсветки экрана: </strong> <?= $request[4] ?> </li>
-                        <li><strong>Диагональ экрана (дюйм): </strong> <?= $request[5] ?> </li>
-                        <li><strong>Частота обновления экрана: </strong> <?= $request[6] ?>Гц </li>
+                        <li><strong>Название производителя: </strong> <?= $request[3] ?> </li>
+                        <li><strong>Название модели телевизора: </strong> <?= $request[4] ?> </li>
+                        <li><strong>Тип подсветки экрана: </strong> <?= $request[5] ?> </li>
+                        <li><strong>Диагональ экрана (дюйм): </strong> <?= $request[6] ?> </li>
+                        <li><strong>Частота обновления экрана: </strong> <?= $request[7] ?>Гц </li>
                         <li>
                             <strong>Статус ремонта: </strong> 
                             <?php
-                                if($request[7] == 1) {
+                                if($request[8] == 1) {
                                     echo "Ожидание выбора мастера";
-                                } elseif($request[7] == 2) {
+                                } elseif($request[8] == 2) {
                                     echo "На утверждении мастера";
-                                } elseif($request[7] == 3) {
+                                } elseif($request[8] == 3) {
                                     echo "В работе";
                                 } else {
                                     echo "Ремонт окончен";
@@ -100,7 +105,7 @@ $select_all_finish_requests = mysqli_fetch_all($select_all_finish_requests);
                         </li>
                         <li>
                         <?php
-                            if($request[7] == 1) { ?>
+                            if($request[8] == 1) { ?>
                                 <a href='./vendor/delete-request.php?id_request=<?= $request[0] ?>'>Отменить заявку</a>
                             <?php }
                         ?>
@@ -130,12 +135,12 @@ $select_all_finish_requests = mysqli_fetch_all($select_all_finish_requests);
                 <h2>Отремонтированные телевизоры</h2>
                 <?php foreach($select_all_finish_requests as $request) { ?>
                     <ul>
-                        <li><strong>Название производителя: </strong> <?= $request[2] ?> </li>
-                        <li><strong>Название модели телевизора: </strong> <?= $request[3] ?> </li>
-                        <li><strong>Тип подсветки экрана: </strong> <?= $request[4] ?> </li>
-                        <li><strong>Диагональ экрана (дюйм): </strong> <?= $request[5] ?> </li>
-                        <li><strong>Частота обновления экрана: </strong> <?= $request[6] ?>Гц </li>
-                        <li><strong>Цена за ремонт: </strong> <?= $request[8] ?> Руб.</li>
+                        <li><strong>Название производителя: </strong> <?= $request[3] ?> </li>
+                        <li><strong>Название модели телевизора: </strong> <?= $request[4] ?> </li>
+                        <li><strong>Тип подсветки экрана: </strong> <?= $request[5] ?> </li>
+                        <li><strong>Диагональ экрана (дюйм): </strong> <?= $request[6] ?> </li>
+                        <li><strong>Частота обновления экрана: </strong> <?= $request[7] ?>Гц </li>
+                        <li><strong>Цена за ремонт: </strong> <?= $request[9] ?> Руб.</li>
                         <li>
                             <strong>Мастер выполнивший ремонт: </strong> 
                             <?php 
